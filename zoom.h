@@ -31,10 +31,7 @@ private:
     int width_cells = window_width / cell_side;
     int height_cells = window_height / cell_side;
     
-    int begin_pos_x = 0;
-    int begin_pos_y = 0;
-    int final_pos_x = width_cells;
-    int final_pos_y = height_cells;
+    int absolute_size = 1;
     
     int cursor_pos_x = 0;
     int cursor_pos_y = 0;

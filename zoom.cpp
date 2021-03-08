@@ -32,7 +32,25 @@ Zoom::~Zoom()
 }
 
 void Zoom::mousePressEvent (QMouseEvent *event) {
-    std::uniform_int_distribution<> test(0, 24);
+    if(event->button() == Qt::LeftButton) {
+        cursor_pos_x = QCursor::pos().x() - this->geometry().x();
+        cursor_pos_y = QCursor::pos().y() - this->geometry().y();
+        
+        cell_side *= 2;
+        absolute_size *= 2;
+    }
+    
+    if(event->button() == Qt::RightButton && cell_side > 4) {
+        cursor_pos_x = QCursor::pos().x() - this->geometry().x();
+        cursor_pos_y = QCursor::pos().y() - this->geometry().y();
+        
+        cell_side /= 2;
+        absolute_size /= 2;
+    }
+    
+    repaint();
+    
+    /*std::uniform_int_distribution<> test(0, 24);
     if(event->button() == Qt::LeftButton) {
         cursor_pos_x = QCursor::pos().x() - this->geometry().x();
         cursor_pos_y = QCursor::pos().y() - this->geometry().y();
@@ -56,7 +74,7 @@ void Zoom::mousePressEvent (QMouseEvent *event) {
         
         cell_side *= 2;
         qDebug() << cursor_pos_x << " " << cursor_pos_y;
-    }
+    }*/
 }
 
 void Zoom::paintEvent(QPaintEvent* event) {
@@ -65,17 +83,17 @@ void Zoom::paintEvent(QPaintEvent* event) {
     QPainter paint_object(this);
     
     std::uniform_int_distribution<> binary(0, 1);
-    std::uniform_int_distribution<> color(0, 255);
     
-    for (int w = begin_pos_x; w < final_pos_x; w++) {
-        for (int h = begin_pos_y; h < final_pos_y; h++) {
+    paint_object.setBrush(QBrush(Qt::black));
+    paint_object.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+    
+    for (int w = 0; w < width_cells; w++) {
+        for (int h = 0; h < height_cells; h++) {
             //QColor cell_color(color(rand_engine), color(rand_engine), color(rand_engine));
             
-            paint_object.setBrush(QBrush(Qt::black));
-            paint_object.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-            
             if (cells[w][h] == 1) {
-                paint_object.drawRect(w * cell_side, h * cell_side, cell_side, cell_side);
+                paint_object.drawRect(this->width() / absolute_size - cursor_pos_x + w * cell_side,
+                                      this->height() / absolute_size - cursor_pos_y + h * cell_side, cell_side, cell_side);
             }
         }
     }
