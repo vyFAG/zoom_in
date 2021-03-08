@@ -1,6 +1,8 @@
 #include "zoom.h"
 #include "ui_zoom.h"
 #include <QPainter>
+#include <QWheelEvent>
+#include <QDebug>
 #include <random>
 
 Zoom::Zoom(QWidget *parent)
@@ -9,8 +11,10 @@ Zoom::Zoom(QWidget *parent)
 {
     ui->setupUi(this);
     
-    std::random_device randoming;
-    std::mt19937 rand_engine(randoming());
+    this->setFixedSize(window_width, window_height);
+    
+    rand_engine = std::mt19937(randoming());
+    
     std::uniform_int_distribution<> binary(0, 1);
     
     cells.resize(width_cells);
@@ -27,18 +31,44 @@ Zoom::~Zoom()
     delete ui;
 }
 
+void Zoom::mousePressEvent (QMouseEvent *event) {
+    std::uniform_int_distribution<> test(0, 24);
+    if(event->button() == Qt::LeftButton) {
+        cursor_pos_x = QCursor::pos().x() - this->geometry().x();
+        cursor_pos_y = QCursor::pos().y() - this->geometry().y();
+        
+        int begin_cell_x = ceil(cursor_pos_x / cell_side);
+        int begin_cell_y = ceil(cursor_pos_y / cell_side);
+        
+        
+        if (begin_cell_x < width_cells / 4) {
+            begin_pos_x = 0;
+            final_pos_x = width_cells / 2;
+        }
+        
+        if (begin_cell_x > width_cells / 4 * 3) { // add
+            begin_pos_x = 0;
+        }
+        
+        if (begin_cell_y > height_cells / 4) {
+            begin_pos_x = 0;
+        }
+        
+        cell_side *= 2;
+        qDebug() << cursor_pos_x << " " << cursor_pos_y;
+    }
+}
+
 void Zoom::paintEvent(QPaintEvent* event) {
     Q_UNUSED(event);
     
     QPainter paint_object(this);
     
-    std::random_device randoming;
-    std::mt19937 rand_engine(randoming());
     std::uniform_int_distribution<> binary(0, 1);
     std::uniform_int_distribution<> color(0, 255);
     
-    for (int w = 0; w < this->width() / cell_side; w++) {
-        for (int h = 0; h < this->height() / cell_side; h++) {
+    for (int w = begin_pos_x; w < final_pos_x; w++) {
+        for (int h = begin_pos_y; h < final_pos_y; h++) {
             //QColor cell_color(color(rand_engine), color(rand_engine), color(rand_engine));
             
             paint_object.setBrush(QBrush(Qt::black));
