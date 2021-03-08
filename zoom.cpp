@@ -32,6 +32,7 @@ Zoom::~Zoom()
 }
 
 void Zoom::mousePressEvent (QMouseEvent *event) {
+    //qDebug() << cursor_pos_x / absolute_size - this->width() / (absolute_size * 2) << " " << cursor_pos_y / absolute_size- this->height() / (absolute_size * 2);
     if(event->button() == Qt::LeftButton) {
         cursor_pos_x = QCursor::pos().x() - this->geometry().x();
         cursor_pos_y = QCursor::pos().y() - this->geometry().y();
@@ -46,7 +47,9 @@ void Zoom::mousePressEvent (QMouseEvent *event) {
         
         cell_side /= 2;
         absolute_size /= 2;
-    }
+    } 
+    //qDebug() << cursor_pos_x << " " << cursor_pos_y;
+    
     
     repaint();
     
@@ -92,9 +95,9 @@ void Zoom::paintEvent(QPaintEvent* event) {
             //QColor cell_color(color(rand_engine), color(rand_engine), color(rand_engine));
             
             if (cells[w][h] == 1) {
-                paint_object.drawRect(this->width() / absolute_size - cursor_pos_x + w * cell_side,
-                                      this->height() / absolute_size - cursor_pos_y + h * cell_side, cell_side, cell_side);
+                paint_object.drawRect(w * cell_side, h * cell_side, cell_side, cell_side);
             }
         }
+        
     }
 }

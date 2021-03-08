@@ -36,6 +36,9 @@ private:
     int cursor_pos_x = 0;
     int cursor_pos_y = 0;
     
+    int last_cursor_pos_x = 0;
+    int last_cursor_pos_y = 0;
+    
     QVector<QVector<bool>> cells;
     
     std::random_device randoming;
